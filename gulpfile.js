@@ -15,6 +15,24 @@ const BANNER = `/*!
 Gulp.task('default', () => {
 });
 
+Gulp.task('vendor:clean', () => {
+  return Del(['docs/_vendor/**/*']);
+});
+
+Gulp.task('vendor:copy', ['vendor:clean'],() => {
+  const copyFiles = Array.prototype.concat.apply(
+    [],
+    Object.keys(PackageJSON.config.exportFiles).map((libName) => {
+      return PackageJSON.config.exportFiles[libName].map((filePath) => {
+        return `${libName}/${filePath}`;
+      });
+    }),
+  );
+  return Gulp.src(copyFiles, { cwd: 'node_modules', base: 'node_modules' })
+    .pipe(Plugins.regexRename(/dist\//, '/'))
+    .pipe(Gulp.dest('docs/_vendor'));
+});
+
 Gulp.task('css:clean', () => {
   return Del(['dist/css/**/*']);
 });
